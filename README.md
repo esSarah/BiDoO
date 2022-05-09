@@ -45,4 +45,7 @@ impulse was to use python with opencv. thanks to the length of bills I want to t
 - test USB connected android phone with Python and QT on desktop / notebook
 - test flutter application directly on the phone.
 
+## Plan B
+*in case everything else falls until 20220516*
 
+- At least shorter bills can be converted to DOCX filetype by google lense. A nice mix of classifiers can look for the relevant data in there
