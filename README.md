@@ -1,4 +1,5 @@
 # BiDoO
+
 Filobask Bill or Document OCR
 
 ##Project Structure
@@ -10,7 +11,7 @@ Filobask Bill or Document OCR
 
 # Assignment
 
-Free Project that applies the knowledge inspired by the Ironhack Data Analytics bootcamp
+Free Project that applies the knowledge inspired by the [Ironhack Data Analytics bootcamp](https://www.ironhack.com/de/data-analytics).
 
 # Idea
 
@@ -25,20 +26,23 @@ My idea is to adress as many of those problems as possible.
 
 # Organisation
 
-I'm organizing the project with a [Kanban board on trello](https://trello.com/b/RyxosgRC/filobask-bill-or-document-ocr)
+I'm organizing the project with a [Kanban board on trello](https://trello.com/b/RyxosgRC/filobask-bill-or-document-ocr).
 
 # Research
 
 Since we used it so much in the course and it is basically the standard for data science prototyping, the first
 impulse was to use python with opencv. thanks to the length of bills I want to test to catch data in real time from a video stream.
 
-## Already tested frameworks
+## Already Tested Frameworks
 
 - python with webserver - stream works, but does not play nice with opencv
 - python with Jupyter Notebook. Out of the book it stalls, there are complex solutions, but all in all not worth it.
 - python with Qt UI - could work, but connection to Android notebook and its cam is flaky.
+- Using Python directly on the phone. 
 
-## current status
+## Current Activities
 
-- test USB connected android notebook with Python QT on desktop / notebook
+- test USB connected android phone with Python and QT on desktop / notebook
 - test flutter application directly on the phone.
+
+
