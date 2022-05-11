@@ -1,7 +1,20 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+List<CameraDescription> cameras = [];
+
+
+void main()
+{
+  Future<void> main() async
+  {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    cameras = await availableCameras();
+
+
+    runApp(const MyApp());
+  }
 }
 
 class MyApp extends StatelessWidget {
