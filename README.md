@@ -9,6 +9,8 @@ Filobask Bill or Document OCR
 | Elevator Pitch | 20220511 |  |
 | Final Presentation | 20220520 |  |
 
+[Elevator Pitch Presentation](https://docs.google.com/presentation/d/1qFfitMDrd6ocsBSLyW3meEdjbTlGeKAU87XEDCRloGQ/edit?usp=sharing)
+
 # Assignment
 
 Free Project that applies the knowledge inspired by the [Ironhack Data Analytics bootcamp](https://www.ironhack.com/de/data-analytics).
