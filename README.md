@@ -6,7 +6,7 @@ Filobask Bill or Document OCR
 | Fixed Point in Time | Stardate | Status |
 | ------------------- | -------- | ------ |
 | Kickoff | 20220509 | (Done)
-| Elevator Pitch | 20220511 |  |
+| Elevator Pitch | 20220511 | (Done) |
 | Final Presentation | 20220520 |  |
 
 [Elevator Pitch Presentation](https://docs.google.com/presentation/d/1qFfitMDrd6ocsBSLyW3meEdjbTlGeKAU87XEDCRloGQ/edit?usp=sharing)
@@ -40,12 +40,22 @@ impulse was to use python with opencv. thanks to the length of bills I want to t
 - python with webserver - stream works, but does not play nice with opencv
 - python with Jupyter Notebook. Out of the book it stalls, there are complex solutions, but all in all not worth it.
 - python with Qt UI - could work, but connection to Android notebook and its cam is flaky.
-- Using Python directly on the phone. 
+- Using Python directly on the phone.
+- flutter application directly on the phone.
+
+## tested OCR
+
+- Google Lens (became Plan B)
+- Self made; Klassification Random Forrest, ml assisted pre cleaning of the scan
+- OpenCV
+- Tessseract (Klassik)
+- Google ML
+
 
 ## Current Activities
 
-- test USB connected android phone with Python and QT on desktop / notebook
-- test flutter application directly on the phone.
+- Creating the MVP as phone app (Flutter) with Google ML - no cleaning neccessary, it is just brilliant
+  *making it myself would have been fun as well, but for something published I'd have to drop it anyway. I can't compete with most of the recent solutions*
 
 ## Plan B
 *in case everything else falls until 20220516*

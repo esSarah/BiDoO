@@ -1,8 +1,10 @@
 import 'dart:async';
-
+import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:camera_platform_interface/camera_platform_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:camera/camera.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,6 +19,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _cameraInfo = 'Unknown';
   List<CameraDescription> _cameras = <CameraDescription>[];
+  late CameraController _camera;
   int _cameraIndex = 0;
   int _cameraId = -1;
   bool _initialized = false;
@@ -92,6 +95,13 @@ class _MyAppState extends State<MyApp> {
         enableAudio: _recordAudio,
       );
 
+      _camera = CameraController(
+        camera,
+        ResolutionPreset.high,
+      );
+
+
+
       _errorStreamSubscription?.cancel();
       _errorStreamSubscription = CameraPlatform.instance
           .onCameraError(cameraId)
@@ -109,6 +119,13 @@ class _MyAppState extends State<MyApp> {
         cameraId,
         imageFormatGroup: ImageFormatGroup.unknown,
       );
+
+      _camera.startImageStream((CameraImage image) {
+
+        // Here we will scan the text from the image
+        // which we are getting from the camera.
+
+      });
 
       final CameraInitializedEvent event = await initialized;
       _previewSize = Size(
