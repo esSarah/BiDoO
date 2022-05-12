@@ -23,22 +23,38 @@ class TextRecognizerPainter extends CustomPainter {
 
     final Paint background = Paint()..color = Color(0x99000000);
 
-    for (final textBlock in recognizedText.blocks) {
-      final ParagraphBuilder builder = ParagraphBuilder(
-        ParagraphStyle(
-            textAlign: TextAlign.left,
-            fontSize: 16,
-            textDirection: TextDirection.ltr),
+    for (final textBlock in recognizedText.blocks)
+    {
+      final ParagraphBuilder builder =
+      ParagraphBuilder
+      (
+        ParagraphStyle
+        (
+          textAlign: TextAlign.left,
+          fontSize: 16,
+          textDirection: TextDirection.ltr
+        ),
       );
-      builder.pushStyle(
-          ui.TextStyle(color: Colors.lightGreenAccent, background: background));
+      builder.pushStyle
+      (
+        ui.TextStyle
+        (
+          color: Colors.lightGreenAccent, background: background
+        )
+      );
       builder.addText(textBlock.text);
       builder.pop();
 
-      final left = translateX(
-          textBlock.boundingBox.left, rotation, size, absoluteImageSize);
-      final top = translateY(
-          textBlock.boundingBox.top, rotation, size, absoluteImageSize);
+      final left =
+        translateX
+        (
+          textBlock.boundingBox.left, rotation, size, absoluteImageSize
+        );
+      final top =
+        translateY
+        (
+          textBlock.boundingBox.top, rotation, size, absoluteImageSize
+        );
       final right = translateX(
           textBlock.boundingBox.right, rotation, size, absoluteImageSize);
       final bottom = translateY(

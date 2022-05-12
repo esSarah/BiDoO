@@ -1,21 +1,21 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'support/routes.dart' as router;
 
 List<CameraDescription> cameras = [];
 
 
-void main()
+
+Future<void> main() async
 {
-  Future<void> main() async
-  {
-    WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
 
-    cameras = await availableCameras();
+  cameras = await availableCameras();
 
 
-    runApp(const MyApp());
-  }
+  runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -36,7 +36,10 @@ class MyApp extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+
       ),
+      onGenerateRoute: router.generateRoute,
+      initialRoute: '/',
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -119,7 +122,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {
+          // Navigate to the second screen using a named route.
+          Navigator.pushNamed(context, 'Camera');
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

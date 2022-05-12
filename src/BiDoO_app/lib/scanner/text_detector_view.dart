@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
-
+import 'current_bill.dart';
 import 'camera_view.dart';
 import 'painters/text_detector_painter.dart';
 
@@ -15,6 +15,8 @@ class _TextRecognizerViewState extends State<TextRecognizerView> {
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
+
+  CurrentBill bill = new CurrentBill();
 
   @override
   void dispose() async {
@@ -43,14 +45,21 @@ class _TextRecognizerViewState extends State<TextRecognizerView> {
       _text = '';
     });
     final recognizedText = await _textRecognizer.processImage(inputImage);
-    if (inputImage.inputImageData?.size != null &&
-        inputImage.inputImageData?.imageRotation != null) {
+    if
+    (
+      inputImage.inputImageData?.size != null &&
+       inputImage.inputImageData?.imageRotation != null
+    )
+    {
+      bill.isProperBill(recognizedText);
       final painter = TextRecognizerPainter(
           recognizedText,
           inputImage.inputImageData!.size,
           inputImage.inputImageData!.imageRotation);
       _customPaint = CustomPaint(painter: painter);
-    } else {
+    }
+    else
+    {
       _text = 'Recognized text:\n\n${recognizedText.text}';
       // TODO: set _customPaint to draw boundingRect on top of image
       _customPaint = null;
