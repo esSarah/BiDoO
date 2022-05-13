@@ -1,7 +1,8 @@
-
-
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:uuid/uuid.dart';
+import 'painters/coordinates_translator.dart';
+import 'dart:io';
+import 'dart:ui';
 
 class Block
 {
@@ -10,13 +11,24 @@ class Block
 
   String fulltext = "";
 
+  double relationToLastBlockY = .0;
+  double relationToLastBlockX = .0;
 
   Block(TextBlock textBlock)
   {
     fulltext = textBlock.text;
+    // coordinates at times of first call
+
+    // if this shall be painted on screen it must be
+    // translated... and it is only correct in this frame
+
+    double topLeftCornerX     = textBlock.boundingBox.left;
+    double topLeftCornerY     = textBlock.boundingBox.top;
+    double bottomRightCornerX = textBlock.boundingBox.right;
+    double bottomRightCornerY = textBlock.boundingBox.bottom;
+
     id =  uuid.v4();
   }
-
 }
 
 class CurrentBill
