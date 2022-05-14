@@ -55,9 +55,9 @@ class CurrentBill
       if(isBill)
       {
         bool isFresh = true;
-        for(final foundblock in foundBlocks)
+        for(final foundBlock in foundBlocks)
         {
-          if(foundblock.fulltext.toLowerCase() == textBlock.text.toLowerCase())
+          if(foundBlock.fulltext.toLowerCase() == textBlock.text.toLowerCase())
           {
             isFresh = true;
           }
