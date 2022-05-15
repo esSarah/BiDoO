@@ -130,61 +130,46 @@ class _CameraViewState extends State<CameraView> {
   {
     if (_mode == ScreenMode.gallery) return null;
     if (cameras.length == 1) return null;
-    return
-      Stack(
-        fit: StackFit.expand,
-        children: [
-          Positioned(
-            left: 40,
-            bottom: 40,
-            child: FloatingActionButton
-            (
-              child: Icon
-              (
-                Platform.isIOS
-                    ? Icons.flip_camera_ios_outlined
-                    : Icons.flip_camera_android_outlined,
-                size: 40,
-              ),
-              onPressed: _switchLiveCamera,
-            ),
-          ),
-          Positioned
+    return Stack
+    (
+      fit: StackFit.expand,
+      children: 
+      [
+        Positioned
+        (
+          left: 40,
+          bottom: 40,
+          child: FloatingActionButton
           (
-            bottom: 40,
-            right: 40,
-            child: FloatingActionButton
+            child: Icon
             (
-              child: const Icon
-              (
-                Icons.ballot,
-                size: 40,
-              ),
-              onPressed: ()
-              {
-                redirect();
-
-              },
+              Platform.isIOS
+                  ? Icons.flip_camera_ios_outlined
+                  : Icons.flip_camera_android_outlined,
+              size: 40,
             ),
+            onPressed: _switchLiveCamera,
           ),
-          // Add more floating buttons if you want
-          // There is no limit
-        ],
-      );
-
-
-      SizedBox(
-        height: 70.0,
-        width: 70.0,
-        child: FloatingActionButton(
-          child: Icon(
-            Platform.isIOS
-                ? Icons.flip_camera_ios_outlined
-                : Icons.flip_camera_android_outlined,
-            size: 40,
+        ),
+        Positioned
+        (
+          bottom: 40,
+          right: 40,
+          child: FloatingActionButton
+          (
+            child: const Icon
+            (
+              Icons.ballot,
+              size: 40,
+            ),
+            onPressed: ()
+            {
+              redirect();
+            },
           ),
-          onPressed: _switchLiveCamera,
-        ));
+        ),
+      ],
+    );
   }
 
   Widget? _floatingNavigationButton() {
@@ -192,31 +177,38 @@ class _CameraViewState extends State<CameraView> {
     if (cameras.length == 1) return null;
     return SizedBox
     (
-        height: 70.0,
-        width: 70.0,
-        child: FloatingActionButton
+      height: 70.0,
+      width: 70.0,
+      child: FloatingActionButton
+      (
+        child: const Icon
         (
-          child: const Icon
-          (
-            Icons.ballot,
-            size: 40,
-          ),
-          onPressed: _switchLiveCamera,
-        ));
+          Icons.ballot,
+          size: 40,
+        ),
+        onPressed: _switchLiveCamera,
+      )
+    );
   }
 
-  Widget _body() {
+  Widget _body()
+  {
     Widget body;
-    if (_mode == ScreenMode.liveFeed) {
+    if (_mode == ScreenMode.liveFeed)
+    {
       body = _liveFeedBody();
-    } else {
+    }
+    else
+    {
       body = _galleryBody();
     }
     return body;
   }
 
-  Widget _liveFeedBody() {
-    if (_controller?.value.isInitialized == false) {
+  Widget _liveFeedBody()
+  {
+    if (_controller?.value.isInitialized == false)
+    {
       return Container();
     }
 
@@ -234,15 +226,19 @@ class _CameraViewState extends State<CameraView> {
       color: Colors.black,
       child: Stack(
         fit: StackFit.expand,
-        children: <Widget>[
-          Transform.scale(
+        children: <Widget>
+        [
+          Transform.scale
+          (
             scale: scale,
-            child: Center(
+            child: Center
+            (
               child: _changingCameraLens
-                  ? Center(
-                      child: const Text('Changing camera lens'),
-                    )
-                  : CameraPreview(_controller!),
+                ? Center
+                (
+                  child: const Text('Changing camera lens'),
+                )
+                : CameraPreview(_controller!),
             ),
           ),
           if (widget.customPaint != null) widget.customPaint!,
