@@ -2,7 +2,7 @@
 
 Filobask Bill or Document OCR
 
-##Project Structure
+## Project Structure
 
 | Fixed Point in Time | Stardate | Status |
 | ------------------- | -------- | ------ |
