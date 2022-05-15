@@ -34,8 +34,8 @@ I'm organizing the project with a [Kanban board on trello](https://trello.com/b/
 
 ## Current Activities
 
-- Creating the MVP as phone app (Flutter) with Google ML - no cleaning neccessary, it is just brilliant<br>
-  *making it myself would have been fun as well, but for something published I'd have to drop it anyway. I can't compete with most of the recent solutions*
+- Creating the MVP as phone app (Flutter) with Google ML - no cleaning of the pictures neccessary, it is just brilliant.<br>
+  *Making it myself would have been fun as well, but for something published I'd have to drop it anyway. I can't compete with most of the recent solutions*
   
 # Current Status
 - Complex Navigation and BloC Management added, Scan Results are shown in List. 

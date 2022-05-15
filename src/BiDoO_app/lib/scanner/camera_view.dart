@@ -10,7 +10,8 @@ import '../main.dart';
 
 enum ScreenMode { liveFeed, gallery }
 
-class CameraView extends StatefulWidget {
+class CameraView extends StatefulWidget
+{
   CameraView
   (
     {
@@ -133,7 +134,7 @@ class _CameraViewState extends State<CameraView> {
     return Stack
     (
       fit: StackFit.expand,
-      children: 
+      children:
       [
         Positioned
         (
