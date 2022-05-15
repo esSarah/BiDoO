@@ -59,7 +59,7 @@ class CurrentBill
         {
           if(foundBlock.fulltext.toLowerCase() == textBlock.text.toLowerCase())
           {
-            isFresh = true;
+            isFresh = false;
           }
         }
         if(isFresh)

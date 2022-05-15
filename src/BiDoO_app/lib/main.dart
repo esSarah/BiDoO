@@ -2,6 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'support/routes.dart' as router;
 import 'main_bloc.dart';
+import 'scanner/current_bill.dart';
 
 List<CameraDescription> cameras = [];
 
@@ -61,11 +62,11 @@ class _MyHomePageState extends State<MyHomePage>
     mainBloc = widget.mainBloc;
     return StreamBuilder
     (
-        stream: mainBloc.master,
+      stream: mainBloc.master,
       builder:
       (
-      BuildContext  context,
-          AsyncSnapshot state,
+        BuildContext  context,
+        AsyncSnapshot state,
       )
       {
         if
@@ -74,44 +75,85 @@ class _MyHomePageState extends State<MyHomePage>
             state.data.status == MainStates.isInitializing
         )
         {
-          if (state.data == null) {
+          if (state.data == null)
+          {
             mainBloc.poke(context);
+
           }
           return Text('');
         }
         else
         {
-          return Scaffold
-          (
-            appBar: AppBar
+          if (state.data.status == MainStates.isShowing)
+          {
+            // build page as list
+            List<Widget> widgets = List<Widget>.empty();
+
+            for (Block block in state.data.currentBill.foundBlocks)
+            {
+              widgets.add(Text(block.fulltext));
+            }
+
+
+            return Scaffold
             (
-              title: Text('BiDoO'),
-            ),
-            body: Center
-            (
-              child: Column
+              body: ListView.builder
               (
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>
-                [
-                  Text
-                    (
-                    'Use the back button after you filmed the bill:',
-                  ),
-                ],
+                itemCount: widgets.length,
+                itemBuilder: (context, index) {
+                  return widgets[index];
+                },
               ),
-            ),
-            floatingActionButton: FloatingActionButton
+              floatingActionButton: FloatingActionButton
+              (
+                onPressed: ()
+                {
+                  // Navigate to the second screen using a named route.
+                  Navigator.pushNamed
+                  (
+                    context,
+                    'Camera',
+                    arguments: router.MainBlocArgument(mainBloc),
+                  );
+                },
+                tooltip: 'Scan',
+                child: const Icon(Icons.add),
+              ),
+            );
+          }
+          else
+          {
+            return Scaffold
             (
-              onPressed: ()
-              {
-                // Navigate to the second screen using a named route.
-                Navigator.pushNamed(context, 'Camera');
-              },
-              tooltip: 'Increment',
-              child: const Icon(Icons.add),
-            ),
-          );
+              appBar: AppBar
+              (
+                title: Text('BiDoO'),
+              ),
+              body: Center
+                (
+                child: Column
+                (
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const <Widget>
+                  [
+                    Text
+                      (
+                      'Use the back button after you filmed the bill:',
+                    ),
+                  ],
+                ),
+              ),
+              floatingActionButton: FloatingActionButton
+              (
+                onPressed: ()
+                {
+                  mainBloc.mainEvents.add(MainStartReadingEvent());
+                },
+                tooltip: 'Scan',
+                child: const Icon(Icons.add),
+              ),
+            );
+          }
         }
       }
     );

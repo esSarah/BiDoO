@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import '../main_bloc.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,21 +11,26 @@ import '../main.dart';
 enum ScreenMode { liveFeed, gallery }
 
 class CameraView extends StatefulWidget {
-  CameraView(
-      {Key? key,
+  CameraView
+  (
+    {
+      Key? key,
       required this.title,
       required this.customPaint,
       this.text,
       required this.onImage,
-      this.initialDirection = CameraLensDirection.back})
-      : super(key: key);
+      this.initialDirection = CameraLensDirection.back,
+      this.mainBloc,
+    }
+  )
+  : super(key: key);
 
   final String title;
   final CustomPaint? customPaint;
   final String? text;
   final Function(InputImage inputImage) onImage;
   final CameraLensDirection initialDirection;
-
+  final MainBloc? mainBloc;
   @override
   _CameraViewState createState() => _CameraViewState();
 }
@@ -40,26 +45,38 @@ class _CameraViewState extends State<CameraView> {
   double zoomLevel = 0.0, minZoomLevel = 0.0, maxZoomLevel = 0.0;
   final bool _allowPicker = true;
   bool _changingCameraLens = false;
+  MainBloc? _mainBloc;
 
   @override
-  void initState() {
+  void initState()
+  {
     super.initState();
-
+    _mainBloc = widget.mainBloc;
     _imagePicker = ImagePicker();
 
-    if (cameras.any(
-      (element) =>
+    if
+    (
+      cameras.any
+      (
+       (element) =>
           element.lensDirection == widget.initialDirection &&
           element.sensorOrientation == 90,
-    )) {
-      _cameraIndex = cameras.indexOf(
+      )
+    )
+    {
+      _cameraIndex = cameras.indexOf
+      (
         cameras.firstWhere((element) =>
             element.lensDirection == widget.initialDirection &&
             element.sensorOrientation == 90),
       );
-    } else {
-      _cameraIndex = cameras.indexOf(
-        cameras.firstWhere(
+    }
+    else
+    {
+      _cameraIndex = cameras.indexOf
+      (
+        cameras.firstWhere
+        (
           (element) => element.lensDirection == widget.initialDirection,
         ),
       );
@@ -75,25 +92,32 @@ class _CameraViewState extends State<CameraView> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+  Widget build(BuildContext context)
+  {
+    return Scaffold
+    (
+      appBar: AppBar
+      (
         title: Text(widget.title),
-        actions: [
+        actions:
+        [
           if (_allowPicker)
-            Padding(
-              padding: EdgeInsets.only(right: 20.0),
-              child: GestureDetector(
-                onTap: _switchScreenMode,
-                child: Icon(
-                  _mode == ScreenMode.liveFeed
-                      ? Icons.photo_library_outlined
-                      : (Platform.isIOS
-                          ? Icons.camera_alt_outlined
-                          : Icons.camera),
-                ),
+          Padding
+          (
+            padding: EdgeInsets.only(right: 20.0),
+            child: GestureDetector
+            (
+              onTap: _switchScreenMode,
+              child: Icon
+              (
+                _mode == ScreenMode.liveFeed
+                    ? Icons.photo_library_outlined
+                    : (Platform.isIOS
+                        ? Icons.camera_alt_outlined
+                        : Icons.camera),
               ),
             ),
+          ),
         ],
       ),
       body: _body(),
@@ -102,10 +126,54 @@ class _CameraViewState extends State<CameraView> {
     );
   }
 
-  Widget? _floatingActionButton() {
+  Widget? _floatingActionButton()
+  {
     if (_mode == ScreenMode.gallery) return null;
     if (cameras.length == 1) return null;
-    return SizedBox(
+    return
+      Stack(
+        fit: StackFit.expand,
+        children: [
+          Positioned(
+            left: 40,
+            bottom: 40,
+            child: FloatingActionButton
+            (
+              child: Icon
+              (
+                Platform.isIOS
+                    ? Icons.flip_camera_ios_outlined
+                    : Icons.flip_camera_android_outlined,
+                size: 40,
+              ),
+              onPressed: _switchLiveCamera,
+            ),
+          ),
+          Positioned
+          (
+            bottom: 40,
+            right: 40,
+            child: FloatingActionButton
+            (
+              child: const Icon
+              (
+                Icons.ballot,
+                size: 40,
+              ),
+              onPressed: ()
+              {
+                redirect();
+
+              },
+            ),
+          ),
+          // Add more floating buttons if you want
+          // There is no limit
+        ],
+      );
+
+
+      SizedBox(
         height: 70.0,
         width: 70.0,
         child: FloatingActionButton(
@@ -113,6 +181,24 @@ class _CameraViewState extends State<CameraView> {
             Platform.isIOS
                 ? Icons.flip_camera_ios_outlined
                 : Icons.flip_camera_android_outlined,
+            size: 40,
+          ),
+          onPressed: _switchLiveCamera,
+        ));
+  }
+
+  Widget? _floatingNavigationButton() {
+    if (_mode == ScreenMode.gallery) return null;
+    if (cameras.length == 1) return null;
+    return SizedBox
+    (
+        height: 70.0,
+        width: 70.0,
+        child: FloatingActionButton
+        (
+          child: const Icon
+          (
+            Icons.ballot,
             size: 40,
           ),
           onPressed: _switchLiveCamera,
@@ -160,21 +246,27 @@ class _CameraViewState extends State<CameraView> {
             ),
           ),
           if (widget.customPaint != null) widget.customPaint!,
-          Positioned(
+          Positioned
+          (
             bottom: 100,
             left: 50,
             right: 50,
-            child: Slider(
+            child: Slider
+            (
               value: zoomLevel,
               min: minZoomLevel,
               max: maxZoomLevel,
-              onChanged: (newSliderValue) {
-                setState(() {
+              onChanged: (newSliderValue)
+              {
+                setState(()
+                {
                   zoomLevel = newSliderValue;
                   _controller!.setZoomLevel(zoomLevel);
                 });
               },
-              divisions: (maxZoomLevel - 1).toInt() < 1
+              divisions:
+              (
+                maxZoomLevel - 1).toInt() < 1
                   ? null
                   : (maxZoomLevel - 1).toInt(),
             ),
@@ -340,5 +432,11 @@ class _CameraViewState extends State<CameraView> {
         InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
     widget.onImage(inputImage);
+  }
+
+  void redirect()
+  {
+    _stopLiveFeed();
+    _mainBloc!.mainEvents.add(MainStartShowingResultEvent());
   }
 }

@@ -3,23 +3,45 @@ import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart
 import 'current_bill.dart';
 import 'camera_view.dart';
 import 'painters/text_detector_painter.dart';
+import '../main_bloc.dart';
 
-class TextRecognizerView extends StatefulWidget {
+class TextRecognizerView extends StatefulWidget
+{
+  TextRecognizerView
+  (
+    {
+      Key? key,
+      this.mainBloc,
+    }
+  ):
+  super(key: key);
+  final MainBloc? mainBloc;
   @override
   _TextRecognizerViewState createState() => _TextRecognizerViewState();
 }
 
 class _TextRecognizerViewState extends State<TextRecognizerView> {
   final TextRecognizer _textRecognizer = TextRecognizer();
+  MainBloc? _mainBloc;
   bool _canProcess = true;
   bool _isBusy = false;
   CustomPaint? _customPaint;
   String? _text;
 
-  CurrentBill bill = new CurrentBill();
+  CurrentBill bill = CurrentBill();
 
   @override
-  void dispose() async {
+  initState()
+  {
+    super.initState();
+    _mainBloc = widget.mainBloc;
+    _mainBloc!.mainProperties.currentBill = bill;
+  }
+
+  @override
+  void dispose() async
+  {
+    _mainBloc!.mainEvents.add(MainStartShowingResultEvent());
     _canProcess = false;
     _textRecognizer.close();
     super.dispose();
@@ -34,6 +56,7 @@ class _TextRecognizerViewState extends State<TextRecognizerView> {
       onImage: (inputImage) {
         processImage(inputImage);
       },
+      mainBloc: _mainBloc,
     );
   }
 

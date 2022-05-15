@@ -14,17 +14,16 @@ enum MainStates
 {
 	isInitializing,
 	isIdle,
-	/*
 	isReading,
-	isProcessing,
+//	isProcessing,
 	isShowing
-	*/
 }
 
 class MainProperties
 {
-	MainStates  status          = MainStates.isInitializing;
+	MainStates    status = MainStates.isInitializing;
 	BuildContext? context;
+	CurrentBill?  currentBill;
 	// DatabaseManager     db                  = new DatabaseManager();
 }
 
@@ -39,16 +38,16 @@ class MainInitializeEvent extends MainEvent
 
 }
 
-class MainStartReading extends MainEvent
+class MainStartReadingEvent extends MainEvent
 {
 
 }
 
-class MainStartProcessing extends MainEvent
+class MainStartProcessingEvent extends MainEvent
 {
 	final List<Block> foundBlocks;
 
-	MainStartProcessing
+	MainStartProcessingEvent
 	(
 		{
 			required this.foundBlocks
@@ -56,7 +55,8 @@ class MainStartProcessing extends MainEvent
 	) : super([foundBlocks]);
 }
 
-class MainStartShowingResult extends MainEvent
+
+class MainStartShowingResultEvent extends MainEvent
 {
 
 }
@@ -67,6 +67,7 @@ class MainBloc
 	MainProperties mainProperties = MainProperties();
 
 	final DatabaseManager  db     = DatabaseManager();
+
 
 	final _mainController = StreamController<MainProperties>.broadcast();
 	Stream<MainProperties> get master => _mainController.stream;
@@ -100,7 +101,15 @@ class MainBloc
 		{
 			await _mainInitialize(event);
 		}
-		print(mainProperties.status.toString());
+		if(event is MainStartShowingResultEvent)
+		{
+			await _mainStartShowingResult(event);
+		}
+		if(event is MainStartReadingEvent)
+		{
+			await _mainStartReading(event);
+		}
+		print(event.toString() + " --- " + mainProperties.status.toString());
 		return true;
 	}
 
@@ -108,6 +117,32 @@ class MainBloc
 	{
 		mainProperties.status = MainStates.isIdle;
 		_mainController.add(mainProperties);
+		return true;
+	}
+
+	Future<bool> _mainStartShowingResult(MainStartShowingResultEvent event) async
+	{
+		mainProperties.status = MainStates.isShowing;
+		print(mainProperties.currentBill.toString());
+		Navigator.pushNamed
+		(
+			mainProperties.context!,
+			'BillView',
+			arguments: MainBlocArgument(this),
+		);
+		return true;
+		return true;
+	}
+
+	Future<bool> _mainStartReading(MainStartReadingEvent event) async
+	{
+		mainProperties.status = MainStates.isReading;
+		Navigator.pushNamed
+		(
+			mainProperties.context!,
+			'Camera',
+			arguments: MainBlocArgument(this),
+		);
 		return true;
 	}
 }
