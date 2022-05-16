@@ -74,6 +74,7 @@ class _TextRecognizerViewState extends State<TextRecognizerView> {
        inputImage.inputImageData?.imageRotation != null
     )
     {
+      // my insert, just before the box drawing
       bill.isProperBill(recognizedText);
       final painter = TextRecognizerPainter(
           recognizedText,

@@ -4,15 +4,26 @@ import 'painters/coordinates_translator.dart';
 import 'dart:io';
 import 'dart:ui';
 
+class Line
+{
+  Line();
+}
+
 class Block
 {
-  var uuid = const Uuid();
+  //var uuid = const Uuid();
   String id= "";
 
   String fulltext = "";
 
-  double relationToLastBlockY = .0;
-  double relationToLastBlockX = .0;
+  double relativeRelationToLastBlockY = .0;
+  double relativeRelationToLastBlockX = .0;
+
+  double absolutePositionLeftTopX     = .0;
+  double absolutePositionLeftTopY     = .0;
+  double absolutePositionRightBottomX = .0;
+  double absolutePositionRightBottomY = .0;
+
 
   Block(TextBlock textBlock)
   {
@@ -22,15 +33,22 @@ class Block
     // if this shall be painted on screen it must be
     // translated... and it is only correct in this frame
 
-    double topLeftCornerX     = textBlock.boundingBox.left;
-    double topLeftCornerY     = textBlock.boundingBox.top;
-    double bottomRightCornerX = textBlock.boundingBox.right;
-    double bottomRightCornerY = textBlock.boundingBox.bottom;
+    absolutePositionLeftTopX      = textBlock.boundingBox.left;
+    absolutePositionLeftTopY      = textBlock.boundingBox.top;
+    absolutePositionRightBottomX  = textBlock.boundingBox.right;
+    absolutePositionRightBottomY  = textBlock.boundingBox.bottom;
 
-    id =  uuid.v4();
+    //id =  uuid.v4();
   }
 }
+class ScanIteration
+{
+  List<Line> lines = [];
 
+  ScanIteration();
+}
+
+// make one ScanIteration per image
 class CurrentBill
 {
   bool isBill = false;
@@ -65,7 +83,7 @@ class CurrentBill
         if(isFresh)
         {
           foundBlocks.add(Block(textBlock));
-          print(textBlock.text);
+          // print(textBlock.text);
         }
       }
       else
@@ -83,6 +101,14 @@ class CurrentBill
           }
         }
       }
+      foundBlocks.sort
+      (
+        (a, b) =>
+        a.absolutePositionLeftTopY.compareTo
+        (
+            b.absolutePositionLeftTopY
+        )
+      );
     }
     return false;
   }
