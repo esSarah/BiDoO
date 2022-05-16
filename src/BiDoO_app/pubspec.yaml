@@ -40,6 +40,7 @@ dependencies:
   uuid: ^3.0.6
   sqflite: ^2.0.2+1
   path_provider: ^2.0.10
+  dart_phonetics: ^1.0.1
 
 dev_dependencies:
   flutter_test:

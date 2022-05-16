@@ -56,9 +56,12 @@ class _BillViewState extends State<BillView> {
 
 				CurrentBill? bill = _mainBloc?.mainProperties.currentBill;
 
-				for (Block block in bill!.foundBlocks)
+				for (List<Block> blocks in bill!.iteration)
 				{
-					widgets.add(Text(block.fulltext));
+					for(Block block in blocks)
+					{
+						widgets.add(Text(block.fulltext));
+					}
 				}
 
 
