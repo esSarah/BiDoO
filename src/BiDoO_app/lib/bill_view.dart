@@ -56,10 +56,27 @@ class _BillViewState extends State<BillView> {
 
 				CurrentBill? bill = _mainBloc?.mainProperties.currentBill;
 
-				for(Block block in bill!.iteration)
-				{
-					widgets.add(Text(block.fulltext));
-				}
+				List<Line> billOfLines = bill!.lines;
+
+
+				Column newColumn = Column
+				(
+					children:
+					[
+						for (Line line in billOfLines)
+						Row
+						(
+							children:
+							[
+								for(Block block in line.parts)
+								Text(block.fulltext + " y=" + block.absolutePositionLeftTopY.toString() + "x=" + block.absolutePositionLeftTopX.toString())
+							]
+						)
+					]
+				);
+
+				widgets.add(newColumn);
+
 
 				return Scaffold
 				(
@@ -71,18 +88,58 @@ class _BillViewState extends State<BillView> {
 							return widgets[index];
 						},
 					),
-				floatingActionButton: FloatingActionButton
+
+					floatingActionButton: Stack
 					(
-						onPressed: ()
-						{
-							// Navigate to the second screen using a named route.
-							Navigator.pushNamed
+						fit: StackFit.expand,
+						children:
+						[
+							Positioned
 							(
-								context, '/'
-							);
-						},
-						tooltip: 'Scan',
-						child: const Icon(Icons.arrow_back_ios_rounded),
+								left: 40,
+								bottom: 40,
+								child: FloatingActionButton
+								(
+									heroTag: null,
+									child: const Icon
+									(
+										Icons.cancel,
+										color: Color.fromRGBO(255, 0, 0, 50),
+										size: 40,
+									),
+									onPressed: ()
+									{
+									// Navigate to the first screen using a named route.
+										Navigator.pushNamed
+										(
+											context, '/'
+										);
+									}
+								),
+							),
+							Positioned
+							(
+								bottom: 40,
+								right: 40,
+								child: FloatingActionButton
+								(
+									heroTag: null,
+									child: const Icon
+									(
+										Icons.ballot,
+										size: 40,
+									),
+									onPressed: ()
+									{
+										// Navigate to the first screen using a named route.
+										Navigator.pushNamed
+										(
+											context, '/'
+										);
+									}
+								),
+							),
+						],
 					),
 				);
 			}

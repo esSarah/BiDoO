@@ -3,6 +3,60 @@ import 'package:dart_phonetics/dart_phonetics.dart';
 
 class Line
 {
+  List<Block> parts = [];
+
+  int absolutePositionLeftTopX     = 0;
+  int absolutePositionLeftTopY     = 0;
+  int absolutePositionRightBottomX = 0;
+  int absolutePositionRightBottomY = 0;
+
+  void addBlock(Block newBlockOnTheKid)
+  {
+    if
+    (
+      absolutePositionLeftTopX <
+        newBlockOnTheKid.absolutePositionLeftTopX
+    )
+    {
+      absolutePositionLeftTopX =
+        newBlockOnTheKid.absolutePositionLeftTopX;
+    }
+    if
+    (
+      absolutePositionLeftTopY <
+        newBlockOnTheKid.absolutePositionLeftTopY
+    )
+    {
+      absolutePositionLeftTopY =
+        newBlockOnTheKid.absolutePositionLeftTopY;
+    }
+    if
+    (
+      absolutePositionRightBottomX <
+        newBlockOnTheKid.absolutePositionRightBottomX
+    )
+    {
+      absolutePositionRightBottomX =
+        newBlockOnTheKid.absolutePositionRightBottomX;
+    }
+    if
+    (
+      absolutePositionRightBottomY <
+        newBlockOnTheKid.absolutePositionRightBottomY
+    )
+    {
+      absolutePositionRightBottomY =
+        newBlockOnTheKid.absolutePositionRightBottomY;
+    }
+    parts.add(newBlockOnTheKid);
+    //sort them again along the X axis.
+    parts.sort
+    (
+      (a, b) =>
+      a.absolutePositionLeftTopX.compareTo(b.absolutePositionLeftTopX)
+    );
+
+  }
   Line();
 }
 
@@ -13,8 +67,6 @@ class Block
   String soundex = "";
   String fulltext = "";
 
-  double relativeRelationToLastBlockY = .0;
-  double relativeRelationToLastBlockX = .0;
 
   int absolutePositionLeftTopX     = 0;
   int absolutePositionLeftTopY     = 0;
@@ -60,8 +112,19 @@ class CurrentBill
     "rewe"
   ];
 
+  Iterable<String> sumLabels =
+  [
+    'summe',
+    'gesamt'
+    'bruttoumsatz',
+    'endsumme',
+    'summen'
+  ];
 
-  List<Block> iteration = [];
+
+  List<Block> uniqueBlocks = [];
+
+  List<Line> lines = [];
 
   CurrentBill()
   {
@@ -70,9 +133,12 @@ class CurrentBill
 
   bool isProperBill(RecognizedText current_fulltext)
   {
+
     List<Block> foundBlocks = [];
     for (TextBlock textBlock in current_fulltext.blocks)
     {
+      int counter = 0;
+
       if (isBill)
       {
         foundBlocks.add
@@ -123,49 +189,76 @@ class CurrentBill
       )
     );
 
-    bool breakMeIfYouCan = true;
-    bool leggo = false;
+
+
+    bool isStillGoing = true;
+    bool isAdding     = false;
+    // jump the queue for what is most likely the header
+    // with the address, that might repeat itself later
     int iterator = 5;
-    int finder = 5;
-    int lengthOfIteration = iteration.length;
+    int finder   = 5;
+    int lengthOfIteration   = uniqueBlocks.length;
     int lengthOfFoundBlocks = foundBlocks.length;
 
-    if (iteration.isEmpty)
+    if (uniqueBlocks.isEmpty)
     {
-      iteration = foundBlocks.toList();
+      // after sorting but before later iterations are processed
+      // create the first lists
+      uniqueBlocks = foundBlocks.toList();
+
+      for(Block block in uniqueBlocks)
+      {
+        int yTop = block.absolutePositionLeftTopY;
+        int yBottom = block.absolutePositionRightBottomY;
+        int yCenter = ((yBottom - yTop) / 2).ceil();
+
+        var existingLine = lines.where
+          (
+                (element) =>
+            element.absolutePositionRightBottomY<yBottom+yCenter &&
+                element.absolutePositionLeftTopY>yTop-yCenter
+        );
+
+
+        if (existingLine.isEmpty)
+        {
+          Line toAdd = Line();
+          toAdd.addBlock(block);
+          lines.add(toAdd);
+        }
+        else
+        {
+          // print("Versuche neuen Block ab bestehende Line anzufuegen");
+          lines[lines.indexOf(existingLine.first)].addBlock(block);
+        }
+      }
+
     }
     else
     {
-      while (breakMeIfYouCan)
+      while (isStillGoing)
       {
-        lengthOfIteration = iteration.length;
+        lengthOfIteration = uniqueBlocks.length;
         print("Endlosschleife?");
-        if (!leggo)
+        if (!isAdding)
         {
           if(((iterator+3)>lengthOfIteration))
           {
             print("Found no match");
-            breakMeIfYouCan = false;
+            isStillGoing = false;
           }
           else
           {
-            print("looking at: foundBlocks[" + finder.toString() + "] = \"" + foundBlocks[finder].soundex + "\" and: iteration[" + iterator.toString() +"] = \""+ iteration[iterator].soundex + "\"");
-            print("\"" + foundBlocks[finder].fulltext + "\" vs. \"" + iteration[iterator].fulltext + "\"");
-            print("looking at: foundBlocks[" + (finder+1).toString() + "] = \"" + foundBlocks[finder+1].soundex + "\" and: iteration[" + (iterator+1).toString() +"] = \""+ iteration[iterator + 1].soundex + "\"");
-            print("\"" + foundBlocks[finder+1].fulltext + "\" vs. \"" + iteration[iterator + 1].fulltext + "\"");
-            print("looking at: foundBlocks[" + (finder+2).toString() + "] = \"" + foundBlocks[finder+2].soundex + "\" and: iteration[" + (iterator+2).toString() +"] = \""+ iteration[iterator + 2].soundex + "\"");
-            print("\"" + foundBlocks[finder+2].fulltext + "\" vs. \"" + iteration[iterator + 2].fulltext + "\"");
-
             if
             (
               // look if you can find three blocks with similar text in a row
               // on the existing data.
               foundBlocks[finder].soundex ==
-               iteration[iterator].soundex &&
+               uniqueBlocks[iterator].soundex &&
               foundBlocks[finder + 1].soundex ==
-                iteration[iterator + 1].soundex &&
+                uniqueBlocks[iterator + 1].soundex &&
               foundBlocks[finder + 2].soundex ==
-                iteration[iterator + 2].soundex
+                uniqueBlocks[iterator + 2].soundex
             )
             {
               // If so, we have found a starting point
@@ -174,32 +267,28 @@ class CurrentBill
               // should be added to the finder as well to
               // only add new found data
 
-              // jumo the positions three steps forward,
+              isAdding = true;
 
-              leggo = true;
-
-              // temporary, I want to see if it findeth though place
-              print("Found start at Position: " + iterator.toString());
             }
           }
           iterator++;
           if (iterator > lengthOfIteration)
           {
-            breakMeIfYouCan = false;
+            isStillGoing = false;
           }
         }
         else
         {
-          if(breakMeIfYouCan)
+          if(isStillGoing)
           {
             if (finder + 1 > lengthOfFoundBlocks)
             {
-              breakMeIfYouCan = false;
+              isStillGoing = false;
             }
             else
             {
               print("Finder tries to add " + finder.toString());
-              iteration.add(foundBlocks[finder]);
+              uniqueBlocks.add(foundBlocks[finder]);
               // else add to multiple options, not yet implemented;
             }
             finder++;
