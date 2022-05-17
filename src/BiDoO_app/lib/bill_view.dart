@@ -56,21 +56,18 @@ class _BillViewState extends State<BillView> {
 
 				CurrentBill? bill = _mainBloc?.mainProperties.currentBill;
 
-				for (List<Block> blocks in bill!.iteration)
+				for(Block block in bill!.iteration)
 				{
-					for(Block block in blocks)
-					{
-						widgets.add(Text(block.fulltext));
-					}
+					widgets.add(Text(block.fulltext));
 				}
-
 
 				return Scaffold
 				(
 					body: ListView.builder
 					(
 						itemCount: widgets.length,
-						itemBuilder: (context, index) {
+						itemBuilder: (context, index)
+						{
 							return widgets[index];
 						},
 					),
@@ -80,7 +77,7 @@ class _BillViewState extends State<BillView> {
 						{
 							// Navigate to the second screen using a named route.
 							Navigator.pushNamed
-								(
+							(
 								context, '/'
 							);
 						},
