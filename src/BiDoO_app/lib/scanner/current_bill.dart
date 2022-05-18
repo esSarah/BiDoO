@@ -74,8 +74,9 @@ class Block
   int absolutePositionRightBottomY = 0;
 
 
-  Block(TextBlock textBlock, String soundexBlock)
+  Block(TextLine textBlock, String soundexBlock)
   {
+
     soundex = soundexBlock;
     fulltext = textBlock.text;
     // coordinates at times of first call
@@ -98,17 +99,54 @@ class ScanIteration
   ScanIteration();
 }
 
+class ItemList
+{
+  List<Item> product = [];
+  double sum = .0;
+
+  bool isValid()
+  {
+    double currentSum = .0;
+    for(Item item in product)
+    {
+      currentSum += item.value;
+    }
+
+    return (currentSum == sum);
+  }
+
+  ItemList();
+}
+class Item
+{
+  String name = "";
+  double value = .0;
+
+  Item();
+}
+
 // make one ScanIteration per image
 class CurrentBill
 {
   bool isBill = false;
+
+  String shopName = "";
+  String shopStreet = "";
+  String shopZip = "";
+  String shopCity = "";
+
+  DateTime timeOfTransaction = DateTime.now();
+
+
+
 
   final soundex = Soundex.genealogyEncoder;
 
   Iterable<String> shops =
   [
     "kaufland",
-    "liedl",
+    "lidl",
+    "lodl", // they really use a hard to read logo
     "rewe"
   ];
 
@@ -118,38 +156,172 @@ class CurrentBill
     'gesamt'
     'bruttoumsatz',
     'endsumme',
-    'summen'
+    'summen',
+    'summe eur'
   ];
 
+
+
+  int addLines(TextBlock textBlock, List<Block> listToAddLinesTo)
+  {
+    int numberOfLines = 0;
+
+    for(TextLine line in textBlock.lines)
+    {
+      numberOfLines++;
+      listToAddLinesTo.add
+      (
+        Block
+        (
+          line,
+          soundex.encode(line.text).toString()
+        )
+      );
+    }
+
+    return numberOfLines;
+  }
+
+  int addSortedLines(List<Block> cleanedBlocks)
+  {
+    List<Line> newLines = [];
+    int numberOfLines = 0;
+
+    for(Block block in cleanedBlocks)
+    {
+      numberOfLines++;
+      int yTop = block.absolutePositionLeftTopY;
+      int yBottom = block.absolutePositionRightBottomY;
+      int yCenter = ((yBottom - yTop) / 2).ceil();
+
+      var existingLine = newLines.where
+      (
+        (element) =>
+        (
+          element.absolutePositionRightBottomY < yBottom + yCenter &&
+          element.absolutePositionLeftTopY > yTop - yCenter
+        )
+      );
+
+      if (existingLine.isEmpty)
+      {
+        Line toAdd = Line();
+        toAdd.addBlock(block);
+        newLines.add(toAdd);
+      }
+      else
+      {
+        // print("Versuche neuen Block ab bestehende Line anzufuegen");
+        newLines[newLines.indexOf(existingLine.first)].addBlock(block);
+      }
+    }
+
+    lines += newLines;
+    print("added " + numberOfLines.toString() + " new lines");
+    return numberOfLines;
+  }
 
   List<Block> uniqueBlocks = [];
 
   List<Line> lines = [];
+  ItemList itemList = ItemList();
 
   CurrentBill()
   {
     ;
   }
 
-  bool isProperBill(RecognizedText current_fulltext)
+
+
+  bool findItems()
+  {
+    print("findItems was called");
+
+    // searched for a number of multiplications (signaled by * or x)
+    RegExp multiples  = RegExp
+    (
+      r'^[\d]+[ ]+[x|*]$'
+    );
+
+    // searches for a typical price / sum at the end of a line
+    RegExp price      = RegExp
+    (
+      r'^-?[ ]*([\d]+[,|.]\d\d[ ]+[A|B|K|Eur|Euro|€]$)|(^-?[ ]*[\d]+[,|.]\d\d$)'
+    );
+
+    // used to extract exact price
+    RegExp exactPrice = RegExp
+    (
+      r'^-?[ ]*[\d]+[,|.]\d\d'
+    );
+    int  LineNumberOfSum        = 0;
+    bool theCounteningHathBegun = false;
+    bool theCounteningIsOver    = false;
+
+    for(Line line in lines.reversed.toList())
+    {
+      for (String currentSearchTerm in sumLabels)
+      {
+        if
+        (
+          !theCounteningHathBegun &&
+          line.parts.first.soundex ==
+          soundex.encode(currentSearchTerm).toString()
+        )
+        {
+          // one of the labels signifying the sum total
+          // was found
+          theCounteningHathBegun = true;
+
+          bool sumNotFound = true;
+          double sum = .0;
+          print("Found a sum");
+          for(Block block in line.parts)
+          {
+            print("-" + block.fulltext + "-");
+            if(block.fulltext.contains(price))
+            {
+              print("Found something out here");
+              sumNotFound = false;
+              Iterable<RegExpMatch> exactPriceList = exactPrice.allMatches(line.parts.last.fulltext);
+              if(exactPriceList.isNotEmpty)
+              {
+                String? extract = "";
+                extract = exactPriceList.first.group(0);
+                if(extract != null)
+                {
+                  sum = double.parse(extract.replaceAll(',', '.'));
+                }
+                print("The Sum of all articles is " + sum.toString());
+                bool sumNotFound = false;
+              }
+            }
+          }
+          if(sumNotFound)
+          {
+            print("but no money");
+          }
+
+        }
+      }
+      LineNumberOfSum++;
+    }
+
+
+    return itemList.isValid();
+  }
+
+  bool isProperBill(RecognizedText currentFulltext)
   {
 
     List<Block> foundBlocks = [];
-    for (TextBlock textBlock in current_fulltext.blocks)
+    for (TextBlock textBlock in currentFulltext.blocks)
     {
       int counter = 0;
 
       if (isBill)
       {
-        foundBlocks.add
-        (
-          Block
-          (
-            textBlock,
-            soundex.encode
-            (textBlock.text).toString()
-          )
-        );
+        addLines(textBlock, foundBlocks);
       }
       else
       {
@@ -162,8 +334,9 @@ class CurrentBill
             {
               print("found " + textWord.text);
               isBill = true;
-              PhoneticEncoding? soundexBlock = soundex.encode(textBlock.text);
-              foundBlocks.add(Block(textBlock, soundexBlock.toString()));
+              //PhoneticEncoding? soundexBlock = soundex.encode(textBlock.text);
+              addLines(textBlock, foundBlocks);
+              // foundBlocks.add(Block(textLine, soundexBlock.toString()));
               isFound = true;
               //break;
             }
@@ -205,41 +378,15 @@ class CurrentBill
       // after sorting but before later iterations are processed
       // create the first lists
       uniqueBlocks = foundBlocks.toList();
-
-      for(Block block in uniqueBlocks)
-      {
-        int yTop = block.absolutePositionLeftTopY;
-        int yBottom = block.absolutePositionRightBottomY;
-        int yCenter = ((yBottom - yTop) / 2).ceil();
-
-        var existingLine = lines.where
-          (
-                (element) =>
-            element.absolutePositionRightBottomY<yBottom+yCenter &&
-                element.absolutePositionLeftTopY>yTop-yCenter
-        );
-
-
-        if (existingLine.isEmpty)
-        {
-          Line toAdd = Line();
-          toAdd.addBlock(block);
-          lines.add(toAdd);
-        }
-        else
-        {
-          // print("Versuche neuen Block ab bestehende Line anzufuegen");
-          lines[lines.indexOf(existingLine.first)].addBlock(block);
-        }
-      }
-
+      addSortedLines(uniqueBlocks);
     }
     else
     {
+      List<Block> newEntries = [];
       while (isStillGoing)
       {
         lengthOfIteration = uniqueBlocks.length;
-        print("Endlosschleife?");
+
         if (!isAdding)
         {
           if(((iterator+3)>lengthOfIteration))
@@ -262,12 +409,11 @@ class CurrentBill
             )
             {
               // If so, we have found a starting point
-
-              // now the difference to the end of the old data
-              // should be added to the finder as well to
-              // only add new found data
-
               isAdding = true;
+              // only add new found data
+              finder = lengthOfIteration - iterator -5;
+              // the five was added earlier as a starting point
+              // after the potentially redundant address
 
             }
           }
@@ -288,7 +434,7 @@ class CurrentBill
             else
             {
               print("Finder tries to add " + finder.toString());
-              uniqueBlocks.add(foundBlocks[finder]);
+              newEntries.add(foundBlocks[finder]);
               // else add to multiple options, not yet implemented;
             }
             finder++;
@@ -296,6 +442,8 @@ class CurrentBill
           }// not used now, but keeps track of existing entries
         }
       }
+      addSortedLines(newEntries);
+      uniqueBlocks += newEntries;
     }
     return true;
   }

@@ -134,12 +134,42 @@ class _MyHomePageState extends State<MyHomePage>
                 child: Column
                 (
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>
+                  children: <Widget>
                   [
-                    Text
-                      (
+                    const Text
+                    (
                       'Use the back button after you filmed the bill:',
                     ),
+                    ButtonBar
+                    (
+                      children:
+                      [
+                        ElevatedButton
+                        (
+                          child: Text("Test Database"),
+                          onPressed: ()
+                          {
+                            mainBloc.mainEvents.add(MainTestDatabaseEvent());
+                          },
+                        ),
+                        ElevatedButton
+                          (
+                          child: Text("Export"),
+                          onPressed: ()
+                          {
+                            mainBloc.mainEvents.add(MainExportEvent());
+                          },
+                        ),
+                        ElevatedButton
+                        (
+                          child: Text("Clear Data"),
+                          onPressed: ()
+                          {
+                            mainBloc.mainEvents.add(MainClearDataEvent());
+                          },
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),

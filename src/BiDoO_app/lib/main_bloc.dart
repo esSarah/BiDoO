@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'support/database.dart';
 import 'support/routes.dart';
 import 'scanner/current_bill.dart';
+import 'package:uuid/uuid.dart';
 
 /* rather generic bloc
 	 to have all the building blocks
@@ -14,6 +15,7 @@ enum MainStates
 {
 	isInitializing,
 	isIdle,
+	isWaiting,
 	isReading,
 //	isProcessing,
 	isShowing
@@ -21,10 +23,11 @@ enum MainStates
 
 class MainProperties
 {
-	MainStates    status = MainStates.isInitializing;
-	BuildContext? context;
-	CurrentBill?  currentBill;
-	// DatabaseManager     db                  = new DatabaseManager();
+	MainStates      status       = MainStates.isInitializing;
+	BuildContext?   context;
+	CurrentBill?    currentBill;
+	bool            isReading    = false;
+	DatabaseManager db           = DatabaseManager();
 }
 
 abstract class MainEvent
@@ -43,6 +46,11 @@ class MainStartReadingEvent extends MainEvent
 
 }
 
+class MainStartRecordingEvent extends MainEvent
+{
+
+}
+
 class MainStartProcessingEvent extends MainEvent
 {
 	final List<Block> foundBlocks;
@@ -57,6 +65,21 @@ class MainStartProcessingEvent extends MainEvent
 
 
 class MainStartShowingResultEvent extends MainEvent
+{
+
+}
+
+class MainTestDatabaseEvent extends MainEvent
+{
+
+}
+
+class MainExportEvent extends MainEvent
+{
+
+}
+
+class MainClearDataEvent extends MainEvent
 {
 
 }
@@ -82,6 +105,7 @@ class MainBloc
 		mainProperties = MainProperties();
 		mainProperties.status = MainStates.isInitializing;
 		_mainEventController.stream.listen(_mapEventToState);
+		db.initDB();
 	}
 
 	void poke(BuildContext context)
@@ -109,6 +133,23 @@ class MainBloc
 		{
 			await _mainStartReading(event);
 		}
+		if(event is MainStartRecordingEvent)
+		{
+			await _mainStartRecording(event);
+		}
+		if(event is MainTestDatabaseEvent)
+		{
+			await _mainTestDatabase(event);
+		}
+		if(event is MainExportEvent)
+		{
+			await _mainExport(event);
+		}
+		if(event is MainClearDataEvent)
+		{
+			await _mainClearData(event);
+		}
+
 		print(event.toString() + " --- " + mainProperties.status.toString());
 		return true;
 	}
@@ -122,8 +163,10 @@ class MainBloc
 
 	Future<bool> _mainStartShowingResult(MainStartShowingResultEvent event) async
 	{
+		mainProperties.isReading = false;
 		mainProperties.status = MainStates.isShowing;
-		print(mainProperties.currentBill.toString());
+		mainProperties.currentBill?.findItems();
+		print("Push comes to shove");
 		Navigator.pushNamed
 		(
 			mainProperties.context!,
@@ -136,13 +179,75 @@ class MainBloc
 
 	Future<bool> _mainStartReading(MainStartReadingEvent event) async
 	{
-		mainProperties.status = MainStates.isReading;
+		mainProperties.isReading = false;
+		mainProperties.status = MainStates.isWaiting;
+
 		Navigator.pushNamed
 		(
 			mainProperties.context!,
 			'Camera',
 			arguments: MainBlocArgument(this),
 		);
+		return true;
+	}
+
+	Future<bool> _mainStartRecording(MainStartRecordingEvent event) async
+	{
+		mainProperties.status = MainStates.isReading;
+		mainProperties.isReading = true;
+		return true;
+
+	}
+
+	Future<bool> _mainTestDatabase(MainTestDatabaseEvent event) async
+	{
+		print("Database test called");
+		var billID = Uuid();
+		var shopID = Uuid();
+		String fakeBillID = billID.v1();
+		String fakeShopID = shopID.v1();
+		DateTime today = DateTime.now();
+		String stringToday = today.toIso8601String();
+
+		db.execute
+		(
+				'''
+				INSERT INTO Bills ('BillID','ShopID', 'DateOfPurchase')
+				VALUES ('$fakeBillID','$fakeShopID ', '$stringToday')
+				'''
+		);
+		db.debugPrintTable('Bills');
+		return true;
+	}
+
+	Future<bool> _mainExport(MainExportEvent event) async
+	{
+		// by now just a test
+
+		print("Export called");
+		return true;
+	}
+
+	Future<bool> _mainClearData(MainClearDataEvent event) async
+	{
+		db.execute
+		(
+			'''
+			TRUNCATE TABLE Bills;
+			'''
+		);
+		db.execute
+		(
+				'''
+			TRUNCATE TABLE Shop;
+			'''
+		);
+		db.execute(
+				'''
+			TRUNCATE TABLE Items;
+			'''
+		)
+		print("Clear data called");
 		return true;
 	}
 }

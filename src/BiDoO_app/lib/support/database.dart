@@ -11,7 +11,7 @@ class DatabaseManager
 
 	Future<Database> get fetchDatabase async
 	{
-		databaseInstance ??= await initDB();
+		databaseInstance = await initDB();
 		return databaseInstance;
 	}
 
@@ -136,26 +136,25 @@ class DatabaseManager
 	initDB() async
 	{
 		io.Directory documentsDirectory = await getApplicationDocumentsDirectory();
-		String path = join(documentsDirectory.path, 'GrindTheft.db');
-		var db = await openDatabase(path, version: 1, onCreate: onCreateFunc);
+		String path = join(documentsDirectory.path, 'BiDoO.db');
+		var db = await openDatabase(path, version: 2, onCreate: onCreateFunc);
 		return db;
 	}
 
 	String secure(String sql)
 	{
-		sql ??= "";
 		return sql.replaceAll(RegExp('[\']'), '\'\'');
 	}
 
 	Future<int> getIntValue(String label, int characterId) async
 	{
 		String sql = '''
-    SELECT 
-		ValueInteger AS ValueInteger
-		FROM [Value] WHERE
-		CharacterID = $characterId AND
-
-		Label = '${secure(label)}'
+			SELECT 
+			ValueInteger AS ValueInteger
+			FROM [Value] WHERE
+			CharacterID = $characterId AND
+	
+			Label = '${secure(label)}'
     ''';
 		return await executeIntScalar(sql);
 	}
@@ -289,10 +288,50 @@ class DatabaseManager
 
 		return true;
 	}
+
 	void onCreateFunc(Database db, int version) async
 	{
-		// not risking creating a db yet
-		// it is always so hard to replace
-		// after changes
+		String databaseStructur = '''
+
+-- Table: Shop
+CREATE TABLE Shop ( 
+    ShopID CHAR( 38 )      PRIMARY KEY
+                           NOT NULL
+                           UNIQUE,
+    Name   VARCHAR( 255 )  NOT NULL,
+    Street VARCHAR( 255 ),
+    City   VARCHAR( 255 ),
+    Zip    VARCHAR 
+);
+
+
+-- Table: Bills
+CREATE TABLE Bills ( 
+    BillID         CHAR( 38 )  PRIMARY KEY
+                               NOT NULL,
+    ShopID         CHAR( 38 )  NOT NULL,
+    DateOfPurchase DATE        NOT NULL 
+);
+
+
+-- Table: Items
+CREATE TABLE Items ( 
+    ItemID       CHAR( 38 )      PRIMARY KEY
+                                 NOT NULL
+                                 UNIQUE,
+    BillID       CHAR( 38 )      NOT NULL,
+    ItemDeciptor VARCHAR( 255 )  NOT NULL,
+    ItemValue    REAL            NOT NULL 
+);
+    ''';
+		List<String> commands = databaseStructur.split(";");
+		commands.forEach((command)
+		{
+			if(command.isNotEmpty )
+			{
+				//print(command.trim());
+				db.rawQuery(command);
+			}
+		});
 	}
 }

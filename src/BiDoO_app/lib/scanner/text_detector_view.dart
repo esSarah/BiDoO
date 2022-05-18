@@ -75,7 +75,7 @@ class _TextRecognizerViewState extends State<TextRecognizerView> {
     )
     {
       // my insert, just before the box drawing
-      bill.isProperBill(recognizedText);
+      if(_mainBloc!.mainProperties.isReading) bill.isProperBill(recognizedText);
       final painter = TextRecognizerPainter(
           recognizedText,
           inputImage.inputImageData!.size,

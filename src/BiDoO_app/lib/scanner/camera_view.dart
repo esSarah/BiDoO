@@ -95,39 +95,49 @@ class _CameraViewState extends State<CameraView> {
   @override
   Widget build(BuildContext context)
   {
-    return Scaffold
-    (
-      appBar: AppBar
+    return StreamBuilder
       (
-        title: Text(widget.title),
-        actions:
-        [
-          if (_allowPicker)
-          Padding
+        stream: _mainBloc!.master,
+        builder:
+        (
+          BuildContext  context,
+          AsyncSnapshot state,
+        )
+        {
+          return Scaffold
           (
-            padding: EdgeInsets.only(right: 20.0),
-            child: GestureDetector
+            appBar: AppBar
             (
-              onTap: _switchScreenMode,
-              child: Icon
-              (
-                _mode == ScreenMode.liveFeed
-                    ? Icons.photo_library_outlined
-                    : (Platform.isIOS
-                        ? Icons.camera_alt_outlined
-                        : Icons.camera),
-              ),
+              title: Text(widget.title),
+              actions:
+              [
+                if (_allowPicker)
+                Padding
+                (
+                  padding: EdgeInsets.only(right: 20.0),
+                  child: GestureDetector
+                  (
+                    onTap: _switchScreenMode,
+                    child: Icon
+                    (
+                      _mode == ScreenMode.liveFeed
+                          ? Icons.photo_library_outlined
+                          : (Platform.isIOS
+                              ? Icons.camera_alt_outlined
+                              : Icons.camera),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-      body: _body(),
-      floatingActionButton: _floatingActionButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+            body: _body(),
+            floatingActionButton: _floatingActionButton(_mainBloc!.mainProperties.status),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          );
+        }
     );
   }
-
-  Widget? _floatingActionButton()
+  Widget? _floatingActionButton(MainStates mainState)
   {
     if (_mode == ScreenMode.gallery) return null;
     if (cameras.length == 1) return null;
@@ -142,6 +152,7 @@ class _CameraViewState extends State<CameraView> {
           bottom: 40,
           child: FloatingActionButton
           (
+            heroTag: "btnFlip",
             child: Icon
             (
               Platform.isIOS
@@ -158,21 +169,34 @@ class _CameraViewState extends State<CameraView> {
           right: 40,
           child: FloatingActionButton
           (
-            child: const Icon
+            heroTag: "btn1",
+            child: mainState==MainStates.isWaiting
+            ?
+            const Icon
+            (
+              Icons.search_off_sharp,
+              size: 40,
+            )
+            :
+            const Icon
             (
               Icons.ballot,
               size: 40,
             ),
             onPressed: ()
             {
-              redirect();
+              mainState==MainStates.isWaiting
+              ?
+                startRecording()
+              :
+                redirect();
             },
           ),
         ),
       ],
     );
   }
-
+/*
   Widget? _floatingNavigationButton() {
     if (_mode == ScreenMode.gallery) return null;
     if (cameras.length == 1) return null;
@@ -190,7 +214,7 @@ class _CameraViewState extends State<CameraView> {
         onPressed: _switchLiveCamera,
       )
     );
-  }
+  }*/
 
   Widget _body()
   {
@@ -223,9 +247,11 @@ class _CameraViewState extends State<CameraView> {
     // to prevent scaling down, invert the value
     if (scale < 1) scale = 1 / scale;
 
-    return Container(
+    return Container
+    (
       color: Colors.black,
-      child: Stack(
+      child: Stack
+      (
         fit: StackFit.expand,
         children: <Widget>
         [
@@ -271,6 +297,7 @@ class _CameraViewState extends State<CameraView> {
         ],
       ),
     );
+
   }
 
   Widget _galleryBody() {
@@ -287,7 +314,7 @@ class _CameraViewState extends State<CameraView> {
                 ],
               ),
             )
-          : Icon(
+          : const Icon(
               Icons.image,
               size: 200,
             ),
@@ -433,7 +460,13 @@ class _CameraViewState extends State<CameraView> {
 
   void redirect()
   {
-    _stopLiveFeed();
+    //_stopLiveFeed();
     _mainBloc!.mainEvents.add(MainStartShowingResultEvent());
+    dispose();
+  }
+
+  void startRecording()
+  {
+    _mainBloc!.mainEvents.add(MainStartRecordingEvent());
   }
 }

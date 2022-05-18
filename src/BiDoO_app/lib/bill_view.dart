@@ -69,7 +69,7 @@ class _BillViewState extends State<BillView> {
 							children:
 							[
 								for(Block block in line.parts)
-								Text(block.fulltext + " y=" + block.absolutePositionLeftTopY.toString() + "x=" + block.absolutePositionLeftTopX.toString())
+								Text(" -" + block.fulltext + "- ")
 							]
 						)
 					]
