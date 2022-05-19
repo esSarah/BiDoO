@@ -4,6 +4,7 @@ import '../bill_view.dart';
 import '../main_bloc.dart';
 import '../scanner/text_detector_view.dart';
 
+
 class MainBlocArgument
 {
   MainBloc? mainBloc;

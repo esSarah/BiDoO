@@ -54,24 +54,48 @@ class _BillViewState extends State<BillView> {
 				// build page as list
 				List<Widget> widgets = [];
 
-				CurrentBill? bill = _mainBloc?.mainProperties.currentBill;
+				CurrentBill bill = _mainBloc!.mainProperties.currentBill!;
+				ItemList itemList = _mainBloc!.mainProperties.itemList;
 
-				List<Line> billOfLines = bill!.lines;
+				List<Line> billOfLines = bill.lines;
 
 
 				Column newColumn = Column
 				(
 					children:
 					[
-						for (Line line in billOfLines)
 						Row
 						(
 							children:
 							[
-								for(Block block in line.parts)
-								Text(" -" + block.fulltext + "- ")
+								Text(itemList.store.name),
 							]
-						)
+						),
+						Row
+						(
+							children:
+							[
+								Text(itemList.store.street),
+							]
+						),
+						Row
+						(
+							children:
+							[
+								Text(itemList.store.zip + " " + itemList.store.city),
+							]
+						),
+						Row
+						(
+							children:
+							[
+								Text(itemList.date.toString()),
+							]
+						),
+
+						for(Item item in itemList.product)
+							Text(item.name + ": " + item.value.toString() + " EUR")
+
 					]
 				);
 
@@ -132,10 +156,7 @@ class _BillViewState extends State<BillView> {
 									onPressed: ()
 									{
 										// Navigate to the first screen using a named route.
-										Navigator.pushNamed
-										(
-											context, '/'
-										);
+										_mainBloc!.mainEvents.add(MainSaveBillDataEvent());
 									}
 								),
 							),
