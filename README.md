@@ -8,9 +8,12 @@ Filobask Bill or Document OCR
 | ------------------- | -------- | ------ |
 | Kickoff | 20220509 | (Done)
 | Elevator Pitch | 20220511 | (Done) |
-| Final Presentation | 20220520 |  |
+| Final Presentation | 20220520 | Prepared |
 
 [Elevator Pitch Presentation](https://docs.google.com/presentation/d/1qFfitMDrd6ocsBSLyW3meEdjbTlGeKAU87XEDCRloGQ/edit?usp=sharing)
+
+[Final Presentation]
+(https://docs.google.com/presentation/d/15u0AsOKawuic-fKLVZcp7sxOaunpFYmzl4_W0Y_0J7c/edit?usp=sharing)
 
 # Assignment
 
@@ -32,17 +35,22 @@ My idea is to adress as many of those problems as possible.
 I'm organizing the project with a [Kanban board on trello](https://trello.com/b/RyxosgRC/filobask-bill-or-document-ocr).
 
 
-## Current Activities
+## Current Activities (Success)
 
 - Creating the MVP as phone app (Flutter) with Google ML - no cleaning of the pictures neccessary, it is just brilliant.<br>
   *Making it myself would have been fun as well, but for something published I'd have to drop it anyway. I can't compete with most of the recent solutions*
   
 # Current Status
-- Complex Navigation and BloC Management added, Scan Results are shown in List. 
-- Next step... creation of a line object with relative placement in the bill and multible Blocks per line.
+
+- all is ready for the final presentation
 
 ## Completed Activities
 
+- Complex Navigation and BloC Management added, Scan Results are shown in List. 
+- Creation of a line object with relative placement in the bill and multible Blocks per line.
+- Save Products list, Shop and Date info in local SQLite database
+- Enable android export as denormalized CSV 
+-
 # Research
 
 Since we used it so much in the course and it is basically the standard for data science prototyping, the first
@@ -59,7 +67,7 @@ impulse was to use python with opencv. thanks to the length of bills I want to t
 ## Tested OCR
 
 - Google Lens (became Plan B)
-- Self made; Klassification Random Forrest, ml assisted pre cleaning of the scan
+- Self made; Classification Random Forrest, ml assisted pre cleaning of the scan
 - OpenCV
 - Tessseract (Klassik)
 - Google ML
