@@ -1,5 +1,15 @@
 # BiDoO
 
+## Where to go now?
+- Prepare "Lidl" and "Kaufland" parsing, where currently only "Rewe" works.
+- Take some time to find and squish bugs.
+- <p>Experimentation with slightly different concepts.<br>
+Klassification to determin Store and select parsing rules accordingly?</p>
+- Look for paid advertisment options via google
+- publish mvp iteration II (hopefully with ads) on Playstore.
+
+# First sprint done, MVP Prototyping:
+
 Filobask Bill or Document OCR
 
 ## Project Structure
@@ -8,12 +18,11 @@ Filobask Bill or Document OCR
 | ------------------- | -------- | ------ |
 | Kickoff | 20220509 | (Done)
 | Elevator Pitch | 20220511 | (Done) |
-| Final Presentation | 20220520 | Prepared |
+| Final Presentation | 20220520 | (Done) |
 
 [Elevator Pitch Presentation](https://docs.google.com/presentation/d/1qFfitMDrd6ocsBSLyW3meEdjbTlGeKAU87XEDCRloGQ/edit?usp=sharing)
 
-[Final Presentation]
-(https://docs.google.com/presentation/d/15u0AsOKawuic-fKLVZcp7sxOaunpFYmzl4_W0Y_0J7c/edit?usp=sharing)
+[Final Presentation](https://docs.google.com/presentation/d/15u0AsOKawuic-fKLVZcp7sxOaunpFYmzl4_W0Y_0J7c/edit?usp=sharing)
 
 # Assignment
 
